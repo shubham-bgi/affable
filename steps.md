@@ -7,7 +7,11 @@ Steps:
 6. Run - npm start
 7. Make sure influencer API is running on port 3000.
 8. Call the follower API with the given curl
-curl -X 'POST' \
-  'http://localhost:5000/follower-api/follower/cron' \
-  -H 'accept: */*' \
-  -d ''
+curl --location 'http://localhost:5000/follower-api/follower/cron' \
+--header 'accept: */*' \
+--header 'Content-Type: application/json' \
+--data '{
+    "start": 1000000,
+    "end": 1001000,
+    "batch": 10
+}'

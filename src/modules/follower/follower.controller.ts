@@ -9,9 +9,7 @@ export class FollowerController {
   constructor(private readonly followerService: FollowerService) {}
 
   @Post("cron")
-  run(
-    @Body() enQueueDto: EnQueueDto
-  ) {
+  run(@Body() enQueueDto: EnQueueDto) {
     return this.followerService.enQueueTasks(enQueueDto);
   }
 }

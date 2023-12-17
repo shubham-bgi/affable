@@ -53,7 +53,7 @@ export class FollowerService {
         const arr = Array.from({ length: batch }, (value, index) => i + index);
         await this.followerQueue.add(arr, {
           removeOnComplete: true,
-          removeOnFail: 100
+          removeOnFail: 100,
         });
       }
       return "Succesfully added";
@@ -100,12 +100,12 @@ export class FollowerService {
   async update(id: number) {
     try {
       const res = await this.getInfluencerData(id);
-      if(!res ||  !res.pk ) {
-        console.error('Failed fetching from api for id', id);
-        throw 'Failed fetching from api';
+      if (!res || !res.pk) {
+        console.error("Failed fetching from api for id", id);
+        throw `Failed fetching from api ${id}`;
       }
       const { pk, followerCount, followingCount, username } = res;
-  
+
       let follower = await this.getFollower(id);
       follower.id = pk;
       follower.currentFollowerCount = followerCount;
@@ -121,17 +121,17 @@ export class FollowerService {
       }
       await this.setFollower(follower);
     } catch (err) {
-      console.error('Error in update', err.message);
+      console.error("Error in update", err.message);
       throw err;
     }
   }
   async getFollower(id: number): Promise<Follower> {
     const key = this.getKey(id);
-    let follower = await this.cacheManager.get(key) as Follower;
+    let follower = (await this.cacheManager.get(key)) as Follower;
     // if (!follower) {
     //   follower = await this.followerRepository.findOne({ id });
     // }
-    return follower || {} as Follower;
+    return follower || ({} as Follower);
   }
 
   async setFollower(follower: Follower) {
@@ -145,6 +145,6 @@ export class FollowerService {
   }
 
   getKey(id: number) {
-    return 'pk_' + id;
+    return "pk_" + id;
   }
 }
