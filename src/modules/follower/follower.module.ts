@@ -8,6 +8,7 @@ import { FOLLOWER_QUEUE, Follower } from "./follower.entity";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import * as redisStore from "cache-manager-redis-store";
+import { ClickHouseModule } from "../clickHouse/clickHouse.module";
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import * as redisStore from "cache-manager-redis-store";
         httpsAgent: new https.Agent({ keepAlive: true }),
       }),
     }),
+    ClickHouseModule,
   ],
   controllers: [FollowerController],
   providers: [FollowerService],

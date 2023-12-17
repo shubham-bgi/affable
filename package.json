@@ -8,6 +8,8 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
+    "reload": "nest build && pm2 reload main",
+    "stop": "pm2 stop main",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -27,6 +29,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@clickhouse/client": "^0.2.7",
     "@nestjs/bull": "^10.0.1",
     "@nestjs/common": "^7.6.12",
     "@nestjs/config": "^3.1.1",
@@ -40,9 +43,10 @@
     "cache-manager-redis-store": "^2.0.0",
     "class-transformer": "0.3.1",
     "class-validator": "0.12.2",
+    "clickhouse": "^2.6.0",
     "dotenv": "8.2.0",
     "express": "^4.17.3",
-    "moment": "^2.29.1",
+    "moment": "^2.29.4",
     "mysql2": "^3.6.5",
     "nestjs-cls": "^1.6.2",
     "pm2": "^5.3.0",
@@ -63,6 +67,7 @@
     "@types/cache-manager": "^4.0.1",
     "@types/express": "^4.17.13",
     "@types/jest": "27.5.0",
+    "@types/moment": "^2.13.0",
     "@types/node": "^16.0.0",
     "@types/supertest": "^2.0.11",
     "@typescript-eslint/eslint-plugin": "^5.0.0",

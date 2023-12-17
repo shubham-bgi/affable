@@ -20,12 +20,15 @@ import { Repository } from "typeorm";
 import { ConfigService } from "@nestjs/config";
 import { Cache } from "cache-manager";
 import { EnQueueDto } from "./task.dto";
+import { ClickHouseService } from "../clickHouse/clickHouse.service";
+import * as moment from "moment";
 
 interface response {
   pk: number;
   username: string;
   followerCount: number;
   followingCount: number;
+  timestamp: number;
 }
 const TAG = "FOLLOWER_SERVICE";
 
@@ -39,6 +42,7 @@ export class FollowerService {
     private readonly followerQueue: Queue<number[]>,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
+    private readonly clickhouse: ClickHouseService,
     private readonly httpService: HttpService,
     private readonly configService: ConfigService
   ) {}
@@ -48,9 +52,11 @@ export class FollowerService {
       const start = enQueueDto.start || +this.configService.get("PK_START");
       const end = enQueueDto.end || +this.configService.get("PK_END");
       const batch = enQueueDto.batch || +this.configService.get("BATCH_SIZE");
+      const timestamp = moment().unix();
 
       for (let i = start; i < end; i += batch) {
         const arr = Array.from({ length: batch }, (value, index) => i + index);
+        arr.push(timestamp);
         await this.followerQueue.add(arr, {
           removeOnComplete: true,
           removeOnFail: 100,
@@ -69,8 +75,15 @@ export class FollowerService {
   @Process()
   async processTasks(job: Job<number[]>) {
     try {
-      const dataPromises = job.data.map((id) => this.update(id));
-      await Promise.allSettled(dataPromises);
+      const timestamp = job.data.pop();
+      const dataPromises = job.data.map((id) => this.update(id, timestamp));
+      const data = await Promise.allSettled(dataPromises);
+      const values = data
+        .filter((item) => item.status == "fulfilled")
+        .map((item) => {
+          if (item.status == "fulfilled") return item.value;
+        });
+      await this.clickhouse.bulkInsert(TAG, "local.follower", values);
     } catch (err) {
       console.error(TAG, this.jobRange(job), err);
       throw err;
@@ -97,7 +110,7 @@ export class FollowerService {
     return data.data;
   }
 
-  async update(id: number) {
+  async update(id: number, timestamp: number) {
     try {
       const res = await this.getInfluencerData(id);
       if (!res || !res.pk) {
@@ -120,6 +133,8 @@ export class FollowerService {
         follower.averageFollowerCount = followerCount;
       }
       await this.setFollower(follower);
+      res.timestamp = timestamp;
+      return res;
     } catch (err) {
       console.error("Error in update", err.message);
       throw err;
