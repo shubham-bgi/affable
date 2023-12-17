@@ -1,7 +1,7 @@
 import { Body, Controller, Post } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { FollowerService } from "./follower.service";
-import { EnQueueDto } from "./task.dto";
+import { EnQueueDto } from "./dto/task.dto";
 
 @ApiTags("follower")
 @Controller("follower")

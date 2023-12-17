@@ -19,7 +19,7 @@ import { Job, Queue } from "bull";
 import { Repository } from "typeorm";
 import { ConfigService } from "@nestjs/config";
 import { Cache } from "cache-manager";
-import { EnQueueDto } from "./task.dto";
+import { EnQueueDto } from "./dto/task.dto";
 import { ClickHouseService } from "../clickHouse/clickHouse.service";
 import * as moment from "moment";
 
