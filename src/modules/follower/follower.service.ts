@@ -114,8 +114,9 @@ export class FollowerService {
     try {
       const res = await this.getInfluencerData(id);
       if (!res || !res.pk) {
-        console.error("Failed fetching from api for id", id);
-        throw `Failed fetching from api ${id}`;
+        const err = `Failed fetching from api ${id}`;
+        console.error(err);
+        throw err;
       }
       const { pk, followerCount, followingCount, username } = res;
 
