@@ -125,9 +125,9 @@ export class FollowerService {
       follower.currentFollowingCount = followingCount;
       follower.username = username;
       if (follower.averageFollowerCount) {
-        const oldSum = follower.averageFollowerCount * follower.totalRecords;
-        follower.averageFollowerCount =
-          (oldSum + followerCount) / ++follower.totalRecords;
+        const left = (follower.totalRecords / (follower.totalRecords + 1)) * follower.averageFollowerCount;
+        const right = followerCount / ++follower.totalRecords;
+        follower.averageFollowerCount = left + right;
       } else {
         follower.totalRecords = 1;
         follower.averageFollowerCount = followerCount;

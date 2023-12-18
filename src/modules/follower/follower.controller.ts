@@ -8,7 +8,7 @@ import { EnQueueDto } from "./dto/task.dto";
 export class FollowerController {
   constructor(private readonly followerService: FollowerService) {}
 
-  @Post("cron")
+  @Post("enQueueUpdate")
   run(@Body() enQueueDto: EnQueueDto) {
     return this.followerService.enQueueTasks(enQueueDto);
   }
